@@ -1,54 +1,51 @@
-import {Component, EventEmitter, Input, OnInit, Output, ViewEncapsulation} from '@angular/core';
-import {Course} from '../model/course';
-import {MatDialog, MatDialogConfig} from '@angular/material/dialog';
-import {CourseDialogComponent} from '../course-dialog/course-dialog.component';
-import {AngularFireAuth} from '@angular/fire/auth';
-import {map} from 'rxjs/operators';
-import {Observable} from 'rxjs';
+import { Component, EventEmitter, Input, OnInit, Output } from '@angular/core';
+import { AngularFireAuth } from '@angular/fire/auth';
+import { MatDialog } from '@angular/material/dialog';
+import { map } from 'rxjs/operators';
+
+import { Course } from '../model/course';
 
 @Component({
-  selector: 'courses-card-list',
-  templateUrl: './courses-card-list.component.html',
-  styleUrls: ['./courses-card-list.component.css']
+    selector: 'courses-card-list',
+    templateUrl: './courses-card-list.component.html',
+    styleUrls: ['./courses-card-list.component.css']
 })
 export class CoursesCardListComponent implements OnInit {
 
-  @Input()
-  courses: Course[];
+    @Input()
+    courses: Course[];
 
-  @Output()
-  courseEdited = new EventEmitter();
+    @Output()
+    courseEdited = new EventEmitter();
 
-  isLoggedIn: boolean;
+    isLoggedIn: boolean;
 
-  purchaseStarted = false;
+    purchaseStarted = false;
 
-  constructor(
-    private dialog: MatDialog,
-    private afAuth: AngularFireAuth) {
-  }
+    constructor(
+        private dialog: MatDialog,
+        private afAuth: AngularFireAuth) {
+    }
 
-  ngOnInit() {
+    ngOnInit() {
 
-    this.afAuth.authState
-      .pipe(
-        map(user => !!user)
-      )
-      .subscribe(isLoggedIn => this.isLoggedIn = isLoggedIn);
+        this.afAuth.authState
+            .pipe(
+                map(user => !!user)
+            )
+            .subscribe(isLoggedIn => this.isLoggedIn = isLoggedIn);
 
-  }
+    }
 
-  purchaseCourse(course: Course, isLoggedIn: boolean) {
+    purchaseCourse(course: Course, isLoggedIn: boolean) {
+        if (!isLoggedIn) {
+            alert('Please login first.');
+        }
 
-  }
+        // set flag to true for process start.
+        this.purchaseStarted = true;
+
+
+    }
 
 }
-
-
-
-
-
-
-
-
-
