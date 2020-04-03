@@ -4,6 +4,7 @@ import { MatDialog } from '@angular/material/dialog';
 import { map } from 'rxjs/operators';
 
 import { Course } from '../model/course';
+import { CheckoutService } from '../services/checkout.service';
 
 @Component({
     selector: 'courses-card-list',
@@ -24,7 +25,9 @@ export class CoursesCardListComponent implements OnInit {
 
     constructor(
         private dialog: MatDialog,
-        private afAuth: AngularFireAuth) {
+        private afAuth: AngularFireAuth,
+        private checkout: CheckoutService,
+        ) {
     }
 
     ngOnInit() {
@@ -45,7 +48,16 @@ export class CoursesCardListComponent implements OnInit {
         // set flag to true for process start.
         this.purchaseStarted = true;
 
-
+        this.checkout.startCourseCheckoutSession(course.id)
+            .subscribe(
+                () => {
+                    console.log('Stripe checkout session initialized ...');
+                },
+                err => {
+                    console.error(err);
+                    this.purchaseStarted = false;
+                }
+            );
     }
 
 }
