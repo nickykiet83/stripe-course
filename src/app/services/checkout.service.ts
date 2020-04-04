@@ -25,7 +25,7 @@ export class CheckoutService {
         let callbackUrl = `${protocal}//${hostname}`;
 
         if (port) {
-            callbackUrl += port;
+            callbackUrl += `:${port}`;
         }
 
         callbackUrl += '/stripe-checkout';
