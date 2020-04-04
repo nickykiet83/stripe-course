@@ -1,4 +1,5 @@
 import {Request, Response} from 'express';
+const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 interface RequestInfo {
     courseId: string;
@@ -12,6 +13,8 @@ export async function createCheckoutSession(req: Request, res: Response) {
         };
 
         console.log('Purchasing course with id: ', info.courseId);
+
+
 
         res.status(200).send();
 
