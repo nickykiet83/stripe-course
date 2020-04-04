@@ -1,4 +1,6 @@
+import { Course } from './../src/app/model/course';
 import {Request, Response} from 'express';
+import { getDocData } from './database';
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
 interface RequestInfo {
@@ -19,10 +21,9 @@ export async function createCheckoutSession(req: Request, res: Response) {
         let sessionConfig;
 
         if (info.courseId) {
-            sessionConfig = setupPurchaseCourseSession(info);
+            const course: Course = await getDocData(`/courses/${info.courseId}`);
+            sessionConfig = setupPurchaseCourseSession(info, course);
         }
-
-        console.log(sessionConfig);
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
         console.log(session);
@@ -40,14 +41,14 @@ export async function createCheckoutSession(req: Request, res: Response) {
     }
 }
 
-function setupPurchaseCourseSession(info: RequestInfo) {
+function setupPurchaseCourseSession(info: RequestInfo, course: Course) {
     const config = setupBaseSessionConfig(info);
 
     config.line_items = [
         {
-          name: 'Stripe Payments In Practice',
-          description: 'Build your own ecommerce store & membership website with Firebase, Stripe and Express',
-          amount: 5000,
+          name: course.titles.description,
+          description: course.titles.longDescription,
+          amount: course.price * 100,
           currency: 'usd',
           quantity: 1,
         },
