@@ -27,7 +27,10 @@ export async function createCheckoutSession(req: Request, res: Response) {
         const session = await stripe.checkout.sessions.create(sessionConfig);
         console.log(session);
 
-        res.status(200).send();
+        res.status(200).json({
+            stripeCheckoutSessionId: session.id,
+            stripePublicKey: process.env.STRIPE_PUBLIC_KEY
+        });
 
 
 

@@ -1,8 +1,5 @@
-
-
-
 export interface CheckoutSession {
-  stripeCheckoutSessionId:string,
-  stripePublicKey: string;
+    stripeCheckoutSessionId: string;
+    stripePublicKey: string;
 }
 
