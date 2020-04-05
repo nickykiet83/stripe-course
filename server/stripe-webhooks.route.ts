@@ -1,6 +1,6 @@
 import { async } from '@angular/core/testing';
 import { Request, Response } from 'express';
-import { getDocData } from './database';
+import { getDocData, db } from './database';
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -34,10 +34,20 @@ async function onCheckoutSessionCompleted(session) {
     const { userId, courseId } = await getDocData(`purchaseSessions/${purchaseSessionId}`);
 
     if (courseId) {
-        fullfillCoursePurchase(userId, courseId, purchaseSessionId);
+        await fullfillCoursePurchase(userId, courseId, purchaseSessionId);
     }
 }
 
 async function fullfillCoursePurchase(userId: string, courseId: string, purchaseSessionId: string) {
+    const batch = db.batch();
 
+    const purchaseSessionRef = db.doc(`purchaseSessions/${purchaseSessionId}`);
+
+    batch.update(purchaseSessionRef, {status: 'completed'});
+
+    const userCoursesOwnedRef = db.doc(`users/${userId}/coursesOwned/${courseId}`);
+
+    batch.create(userCoursesOwnedRef, {});
+
+    return batch.commit();
 }
