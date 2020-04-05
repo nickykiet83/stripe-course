@@ -1,4 +1,6 @@
+import { async } from '@angular/core/testing';
 import { Request, Response } from 'express';
+import { getDocData } from './database';
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
 
@@ -13,7 +15,8 @@ export async function stripeWebhooks(req: Request, res: Response) {
 
         if (event.type === 'checkout.session.completed') {
             const session = event.data.object;
-            console.log(session);
+            await onCheckoutSessionCompleted(session);
+
         }
 
         res.json({received: true});
@@ -22,6 +25,19 @@ export async function stripeWebhooks(req: Request, res: Response) {
         console.log('Error procession webhook event, reason: ', err);
         return res.status(400).send(`Webhook Error: ${err.message}`);
     }
+}
 
+async function onCheckoutSessionCompleted(session) {
+
+    const purchaseSessionId = session.client_reference_id;
+
+    const { userId, courseId } = await getDocData(`purchaseSessions/${purchaseSessionId}`);
+
+    if (courseId) {
+        fullfillCoursePurchase(userId, courseId, purchaseSessionId);
+    }
+}
+
+async function fullfillCoursePurchase(userId: string, courseId: string, purchaseSessionId: string) {
 
 }
