@@ -80,10 +80,10 @@ function setupPurchaseCourseSession(info: RequestInfo, course: Course, sessionId
     return config;
 }
 
-function setupBaseSessionConfig(info: RequestInfo, sessionId) {
+function setupBaseSessionConfig(info: RequestInfo, sessionId: string) {
     const config: any = {
         payment_method_types: ['card'],
-        success_url: `${info.callbackUrl}/?purchaseResult=success`,
+        success_url: `${info.callbackUrl}/?purchaseResult=success&onGoingPurchaseSessionId=${sessionId}`,
         cancel_url: `${info.callbackUrl}/?purchaseResult=failed`,
         client_reference_id: sessionId
     };
