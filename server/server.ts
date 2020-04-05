@@ -18,7 +18,9 @@ export function initServer() {
         getUserMiddleware,
         createCheckoutSession);
 
-    app.route('/stripe-webhooks').post(stripeWebhooks);
+    app.route('/stripe-webhooks').post(
+        bodyParser.raw({ type: 'application/json' }),
+        stripeWebhooks);
 
     const PORT = process.env.PORT || 9000;
 
