@@ -1,8 +1,14 @@
-import { Observable } from 'rxjs';
-import { Injectable } from '@angular/core';
+import { PurchaseSession } from './../model/purchase-session.model';
+import { Course } from './../model/course';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
-import { CheckoutSession } from '../model/checkout-session.model';
+import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
+import { AngularFirestore } from '@angular/fire/firestore';
+import { Observable } from 'rxjs';
+
+import { CheckoutSession } from '../model/checkout-session.model';
+import { filter, first } from 'rxjs/operators';
+
 declare const Stripe;
 
 @Injectable({
@@ -12,7 +18,8 @@ export class CheckoutService {
 
     private jwtAuth: string;
 
-    constructor(private http: HttpClient, private afAuth: AngularFireAuth) {
+    constructor(private http: HttpClient, private afAuth: AngularFireAuth,
+        private afs: AngularFirestore) {
         afAuth.idToken.subscribe(jwt => this.jwtAuth = jwt);
     }
 
@@ -49,4 +56,14 @@ export class CheckoutService {
             sessionId: session.stripeCheckoutSessionId
         });
     }
+
+    waitForPurchaseCompleted(onGoingPurchaseSessionId: string): Observable<any> {
+        return this.afs.doc<PurchaseSession>(`purchaseSessions/${onGoingPurchaseSessionId}`)
+            .valueChanges()
+            .pipe(
+                filter(purchase => purchase.status === 'completed'),
+                first()
+            );
+    }
 }
+
