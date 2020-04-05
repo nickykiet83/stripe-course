@@ -1,4 +1,3 @@
-import { Timestamp } from '@google-cloud/firestore';
 import { Request, Response } from 'express';
 
 const stripe = require('stripe')(process.env.STRIPE_SECRET_KEY);
@@ -7,7 +6,7 @@ export async function stripeWebhooks(req: Request, res: Response) {
 
     try {
 
-        const signature = req.headers['stripe-signaturue'];
+        const signature = req.headers['stripe-signature'];
 
         const event = stripe.webhooks.constructEvent(
             req.body, signature, process.env.STRIPE_WEBHOOK_SECRET);

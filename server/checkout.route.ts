@@ -28,8 +28,6 @@ export async function createCheckoutSession(req: Request, res: Response) {
             return;
         }
 
-        console.log('Purchasing course with id: ', info);
-
         const purchaseSession = await db.collection('purchaseSessions').doc();
 
         const checkoutSessionData: any = {
@@ -52,7 +50,6 @@ export async function createCheckoutSession(req: Request, res: Response) {
         }
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
-        console.log(session);
 
         res.status(200).json({
             stripeCheckoutSessionId: session.id,

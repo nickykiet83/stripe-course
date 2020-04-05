@@ -1,0 +1,8 @@
+--- STRIPE
+// stripe login
+stripe login
+
+// forward to localhost for testing stripe webhook
+stripe listen --forward-to localhost:9000/stripe-webhooks
+
+
