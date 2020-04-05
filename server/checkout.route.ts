@@ -21,13 +21,21 @@ export async function createCheckoutSession(req: Request, res: Response) {
             userId: req['uid']
         };
 
+        if (!info.userId) {
+            const message = 'User must be authenticated';
+            console.log(message);
+            res.status(403).json({message});
+            return;
+        }
+
         console.log('Purchasing course with id: ', info);
 
         const purchaseSession = await db.collection('purchaseSessions').doc();
 
         const checkoutSessionData: any = {
             status: 'ongoing',
-            created: Timestamp.now()
+            created: Timestamp.now(),
+            userId: info.userId
         };
 
         if (info.courseId) {
@@ -55,7 +63,7 @@ export async function createCheckoutSession(req: Request, res: Response) {
 
     } catch (error) {
         console.log('Unexpected error occured while purchasing course: ', error);
-        res.status(500).json({ error: 'Could not initiate Stripec checkout session' });
+        res.status(500).json({ error: 'Could not initiate Stripe checkout session' });
     }
 }
 

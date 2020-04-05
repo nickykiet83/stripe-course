@@ -14,6 +14,7 @@ export function getUserMiddleware(req: Request, res: Response, next: NextFunctio
             .catch(error => {
                 const message = 'Error verifying Firebase Id token';
                 console.log(message, error);
+                res.status(403).json({message});
             });
     } else {
         next();

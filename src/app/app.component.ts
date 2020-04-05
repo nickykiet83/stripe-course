@@ -18,7 +18,7 @@ export class AppComponent implements OnInit {
 
     constructor(
         private afAuth: AngularFireAuth) {
-            this.afAuth.idToken.subscribe(jwt => console.log(jwt));
+            this.afAuth.idToken.subscribe();
     }
 
     ngOnInit() {

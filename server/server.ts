@@ -2,6 +2,7 @@ import * as express from 'express';
 import { Application } from 'express';
 import { createCheckoutSession } from './checkout.route';
 import { getUserMiddleware } from './get-user.middleware';
+import { stripeWebhooks } from './stripe-webhooks.route';
 
 export function initServer() {
     const bodyParser = require('body-parser');
@@ -16,6 +17,8 @@ export function initServer() {
         bodyParser.json(),
         getUserMiddleware,
         createCheckoutSession);
+
+    app.route('/stripe-webhooks').post(stripeWebhooks);
 
     const PORT = process.env.PORT || 9000;
 
