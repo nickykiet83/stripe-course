@@ -24,7 +24,7 @@ export async function createCheckoutSession(req: Request, res: Response) {
         if (!info.userId) {
             const message = 'User must be authenticated';
             console.log(message);
-            res.status(403).json({message});
+            res.status(403).json({ message });
             return;
         }
 
@@ -42,11 +42,14 @@ export async function createCheckoutSession(req: Request, res: Response) {
 
         await purchaseSession.set(checkoutSessionData);
 
+        const user = await getDocData(`users/${info.userId}`);
+
         let sessionConfig;
 
         if (info.courseId) {
             const course: Course = await getDocData(`/courses/${info.courseId}`);
-            sessionConfig = setupPurchaseCourseSession(info, course, purchaseSession.id);
+            sessionConfig = setupPurchaseCourseSession(info, course, purchaseSession.id,
+                user ? user.stripeCustomerId : undefined);
         }
 
         const session = await stripe.checkout.sessions.create(sessionConfig);
@@ -64,8 +67,8 @@ export async function createCheckoutSession(req: Request, res: Response) {
     }
 }
 
-function setupPurchaseCourseSession(info: RequestInfo, course: Course, sessionId: string) {
-    const config = setupBaseSessionConfig(info, sessionId);
+function setupPurchaseCourseSession(info: RequestInfo, course: Course, sessionId: string, stripeCustomerId: string) {
+    const config = setupBaseSessionConfig(info, sessionId, stripeCustomerId);
 
     config.line_items = [
         {
@@ -80,13 +83,18 @@ function setupPurchaseCourseSession(info: RequestInfo, course: Course, sessionId
     return config;
 }
 
-function setupBaseSessionConfig(info: RequestInfo, sessionId: string) {
+function setupBaseSessionConfig(info: RequestInfo, sessionId: string,
+    stripeCustomerId: string) {
     const config: any = {
         payment_method_types: ['card'],
         success_url: `${info.callbackUrl}/?purchaseResult=success&onGoingPurchaseSessionId=${sessionId}`,
         cancel_url: `${info.callbackUrl}/?purchaseResult=failed`,
         client_reference_id: sessionId
     };
+
+    if (stripeCustomerId) {
+        config.customer = stripeCustomerId;
+    }
 
     return config;
 }

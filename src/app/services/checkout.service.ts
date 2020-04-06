@@ -1,13 +1,12 @@
-import { PurchaseSession } from './../model/purchase-session.model';
-import { Course } from './../model/course';
 import { HttpClient, HttpHeaders } from '@angular/common/http';
 import { Injectable } from '@angular/core';
 import { AngularFireAuth } from '@angular/fire/auth';
 import { AngularFirestore } from '@angular/fire/firestore';
 import { Observable } from 'rxjs';
+import { filter, first } from 'rxjs/operators';
 
 import { CheckoutSession } from '../model/checkout-session.model';
-import { filter, first } from 'rxjs/operators';
+import { PurchaseSession } from './../model/purchase-session.model';
 
 declare const Stripe;
 

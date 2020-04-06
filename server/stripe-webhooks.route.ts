@@ -1,4 +1,3 @@
-import { async } from '@angular/core/testing';
 import { Request, Response } from 'express';
 import { getDocData, db } from './database';
 
@@ -34,11 +33,11 @@ async function onCheckoutSessionCompleted(session) {
     const { userId, courseId } = await getDocData(`purchaseSessions/${purchaseSessionId}`);
 
     if (courseId) {
-        await fullfillCoursePurchase(userId, courseId, purchaseSessionId);
+        await fullfillCoursePurchase(userId, courseId, purchaseSessionId, session.customer);
     }
 }
 
-async function fullfillCoursePurchase(userId: string, courseId: string, purchaseSessionId: string) {
+async function fullfillCoursePurchase(userId: string, courseId: string, purchaseSessionId: string, stripeCustomerId: string) {
     const batch = db.batch();
 
     const purchaseSessionRef = db.doc(`purchaseSessions/${purchaseSessionId}`);
@@ -48,6 +47,9 @@ async function fullfillCoursePurchase(userId: string, courseId: string, purchase
     const userCoursesOwnedRef = db.doc(`users/${userId}/coursesOwned/${courseId}`);
 
     batch.create(userCoursesOwnedRef, {});
+
+    const userRef = db.doc(`users/${userId}`);
+    batch.set(userRef, {stripeCustomerId}, {merge: true});
 
     return batch.commit();
 }
